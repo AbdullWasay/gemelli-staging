@@ -1844,9 +1844,9 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Button, Dropdown, Space, Badge, Input } from "antd";
+import { Button, Dropdown, Badge, Input } from "antd";
 import { MenuOutlined, HeartOutlined } from "@ant-design/icons";
-import { FaAngleDown, FaAngleLeft, FaAngleRight } from "react-icons/fa6";
+import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import { IoSearch } from "react-icons/io5";
 import { LuImage } from "react-icons/lu";
 import { FiPackage } from "react-icons/fi";
@@ -1865,8 +1865,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutHandler } from "@/utils/handleLogout";
 import { getFavorites } from "@/utils/favoritesUtils";
 import { getProfileImageUrl } from "@/utils/imageUtils";
-import { Currency, setCurrency } from "@/redux/reducers/currencySlice";
-import { RootState } from "@/redux/store";
 import {
   selectCurrentUser,
   useCurrentToken,
@@ -2225,16 +2223,6 @@ export default function Header() {
       }
     }
   };
-
-  const globalCurrency = useSelector(
-    (state: RootState) => state.currency.currency
-  );
-
-  const currencyItems: { key: Currency; label: Currency }[] = [
-    { key: "USD", label: "USD" },
-    { key: "EUR", label: "EUR" },
-    { key: "MDL", label: "MDL" },
-  ];
 
   const navItems = [
     "ELECTRONICS & GADGETS",

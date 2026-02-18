@@ -456,8 +456,6 @@ import { LuTruck } from "react-icons/lu";
 import { toast } from "react-toastify";
 import { useParams, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
-import { Currency } from "@/redux/reducers/currencySlice";
 import {
   selectCurrentUser,
   useCurrentToken,
@@ -520,10 +518,6 @@ export default function ProductPage() {
   const [loadingProduct, setLoadingProduct] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [availableSizes, setAvailableSizes] = useState<(number | string)[]>([]);
-
-  const { currency: globalCurrency } = useSelector(
-    (state: RootState) => state.currency
-  );
 
   const user = useSelector(selectCurrentUser);
   const accessToken = useSelector(useCurrentToken);
@@ -709,6 +703,7 @@ export default function ProductPage() {
       favorites.some((item: { id: string }) => item.id === productId)
     );
   }, [productId, user?.id]);
+
 
   const handleAddToCart = async () => {
     if (!productData) return;

@@ -356,7 +356,6 @@ export default function ProductCard({
   itemsSold,
   brand = "Brand",
   size = "Default",
-  currency = "MDL",
 }: ProductCardProps) {
   const router = useRouter();
   const [isFavorite, setIsFavorite] = useState(false);

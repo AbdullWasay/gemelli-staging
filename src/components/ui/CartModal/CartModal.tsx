@@ -340,8 +340,6 @@ import { CloseOutlined } from "@ant-design/icons";
 import { LuTrash2 } from "react-icons/lu";
 import { TbTruckDelivery } from "react-icons/tb";
 import { useRouter } from "next/navigation";
-import { Currency } from "@/redux/reducers/currencySlice";
-import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 import { selectCurrentUser, useCurrentToken } from "@/redux/features/auth/authSlice";
 import { 
@@ -420,10 +418,6 @@ export function CartModal({ isOpen, onClose, items }: CartModalProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items.length, isAuthenticated, isOpen]);
 
-  const { currency: globalCurrency } = useSelector(
-    (state: RootState) => state.currency
-  );
-
   // Legacy multi-currency conversion (kept for future use)
   // const getConvertedPrice = (
   //   price: string | number,
@@ -452,7 +446,8 @@ export function CartModal({ isOpen, onClose, items }: CartModalProps) {
 
   const getConvertedPrice = (
     price: string | number,
-    currency: string = "MDL"
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for API compatibility
+    _currency: string = "MDL"
   ): number => {
     const numericPrice =
       typeof price === "string"

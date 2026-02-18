@@ -28,7 +28,7 @@ const CompleteStoreForm = () => {
   const [storeCategory, setStoreCategory] = useState("");
   const [agree, setAgree] = useState(false);
   const [createStore] = useCreateStoreMutation();
-  const { data: meResponse, isLoading: meLoading, isError: meError } = useGetMeQuery();
+  const { data: meResponse, isLoading: meLoading, isError: meError } = useGetMeQuery(undefined);
 
   useEffect(() => {
     if (meLoading) return;

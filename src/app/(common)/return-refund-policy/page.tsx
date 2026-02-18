@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ArrowLeft, RotateCcw, ShieldCheck, CreditCard, HelpCircle } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export default function ReturnRefundPolicy() {

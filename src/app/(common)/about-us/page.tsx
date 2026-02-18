@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ArrowLeft, Users, Globe, Rocket, Heart, Shield } from "lucide-react";
+import { ArrowLeft, Users, Globe, Heart, Shield } from "lucide-react";
 import Link from "next/link";
 
 export default function AboutUs() {

@@ -2,14 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUp, Mail, Phone, MapPin, ShieldCheck, ExternalLink } from "lucide-react";
+import { ArrowUp, Mail, Phone, MapPin, ExternalLink } from "lucide-react";
 import qr from "@/assets/Footer/QR2.png";
 import apple from "@/assets/Footer/apple.png";
 import play from "@/assets/Footer/playstore.png";
-import Facebook from "@/assets/Footer/facebook.png";
-import insta from "@/assets/Footer/instagram.png";
-import paymentIcons from "@/assets/images/payment.png";
-import { AiOutlineMessage } from "react-icons/ai";
 import { FaTiktok, FaCcVisa, FaCcMastercard, FaInstagram, FaFacebook } from "react-icons/fa6";
 import { SOCIAL_LINKS } from "@/constants/socialLinks";
 
