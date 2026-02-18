@@ -1,0 +1,344 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Seed configuration
+// Note: This requires the TypeScript compilation setup in package.json
+generator seed {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String               @id @default(uuid())
+  email              String               @unique
+  password           String?
+  name               String?
+  profilePic         String?
+  phoneNumber        String?
+  bio                String?
+  role               Role                 @default(USER)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  products           Product[]
+  orders             Order[]
+  store              Store?
+  addresses          Address[]
+  notificationSettings NotificationSettings?
+  notifications      Notification[]
+  subscriptions      Subscription[]       // Relation to subscriptions
+  cart               Cart?
+}
+
+enum Role {
+  ADMIN
+  SELLER
+  USER
+}
+
+model Product {
+  id              String        @id @default(uuid())
+  name            String
+  description     String?
+  price           Float
+  inventory       Int           @default(0)
+  category        String?
+  taxRate         String?
+  discountPrice   Float?
+  onSale          Boolean       @default(false)
+  sku             String?       @unique
+  trackInventory  String?       @default("Yes")
+  lowStockAlert   Int?          @default(5)
+  size            String?
+  color           String?
+  material        String?
+  length          Float?
+  width           Float?
+  height          Float?
+  weight          Float?
+  seoTitle        String?
+  metaDescription String?
+  productTags     String?
+  visibility      String?       @default("Public")
+  status          String?       @default("Published")
+  sellerId        String
+  seller          User          @relation(fields: [sellerId], references: [id])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  orderItems      OrderItem[]
+  productImages   ProductImage[]
+  cartItems       CartItem[]
+}
+
+model Order {
+  id              String        @id @default(uuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  totalAmount     Float
+  subTotal        Float
+  shippingCost    Float         @default(20)
+  status          OrderStatus   @default(PENDING)
+  
+  // Stripe payment information
+  stripeSessionId String?       @unique
+  stripePaymentId String?
+  paymentStatus   PaymentStatus @default(PENDING)
+  paymentMethod   String?
+  
+  // Customer information
+  customerEmail   String
+  customerPhone   String?
+  
+  // Addresses stored as JSON
+  shippingAddress Json
+  billingAddress  Json
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  orderItems      OrderItem[]
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model OrderItem {
+  id                String      @id @default(uuid())
+  orderId           String
+  order             Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId         String
+  product           Product     @relation(fields: [productId], references: [id])
+  
+  // Seller information
+  sellerId          String
+  sellerName        String?
+  sellerEmail       String
+  
+  // Product details at time of purchase
+  productName       String
+  productSku        String?
+  size              String?
+  
+  quantity          Int
+  price             Float
+  imageUrl          String?
+  
+  // Fulfillment
+  fulfillmentStatus OrderStatus @default(PENDING)
+  trackingNumber    String?
+  
+  primary           Boolean     @default(false)  // Keep this if you need it
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model Store {
+  id            String    @id @default(uuid())
+  storeName     String
+  storeCategory String
+  storeWebsite  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id])
+  addresses     Address[]
+}
+
+model Address {
+  id         String   @id @default(uuid())
+  country    String
+  cityState  String
+  postalCode String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  // Relations
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  storeId    String?
+  store      Store?   @relation(fields: [storeId], references: [id])
+}
+
+model NotificationSettings {
+  id                  String   @id @default(uuid())
+  newOrders           Boolean  @default(true)
+  aiRecommendations   Boolean  @default(true)
+  promotionsDiscounts Boolean  @default(true)
+  emailChannel        Boolean  @default(false)  // Changed to false to disable email by default
+  smsChannel          Boolean  @default(false)
+  appNotifications    Boolean  @default(true)
+  marketingEmails     Boolean  @default(false)  // Changed to false to disable marketing emails by default
+  generalUpdates      Boolean  @default(true)
+  orderReminders      Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  lowStockAlerts       Boolean  @default(true)
+  orderStatusUpdates   Boolean  @default(true)
+
+  // Relations
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum NotificationCategory {
+  PRODUCT_UPDATES
+  CAMPAIGN_ALERTS
+  SALES_INSIGHTS
+  STOCK_ALERTS
+}
+
+model Notification {
+  id           String               @id @default(uuid())
+  message      String
+  createdAt    DateTime             @default(now())
+  category     NotificationCategory
+  isRead       Boolean              @default(false)
+  actionText   String?
+  actionUrl    String?
+  actionBgColor String?
+  
+  // Relations
+  userId       String
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  EXPIRED
+  TRIAL
+  PENDING
+}
+
+model Subscription {
+  id                String             @id @default(uuid())
+  status            SubscriptionStatus @default(ACTIVE)
+  startDate         DateTime           @default(now())
+  endDate           DateTime?
+  isAutoRenew       Boolean            @default(true)
+  paymentMethod     String?
+  lastPaymentDate   DateTime?
+  nextBillingDate   DateTime?
+  
+  // Relations
+  userId            String
+  user              User               @relation(fields: [userId], references: [id])
+  subscriptionPlanId String
+  subscriptionPlan  SubscriptionPlan   @relation(fields: [subscriptionPlanId], references: [id])
+  
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+}
+
+model SubscriptionPlan {
+  id                String   @id @default(uuid())
+  title             String
+  description       String
+  price             Float
+  interval          String   // 'month', 'year', etc.
+  features          Json     // JSON array with headings and bullet points
+  
+  // Feature control fields - more efficient for checking permissions
+  maxProducts       Int      @default(10)  // Maximum number of products allowed
+  isAIEnabled       Boolean  @default(false) // Basic AI features
+  isAdvancedAIEnabled Boolean @default(false) // Advanced AI capabilities
+  isCustomizable    Boolean  @default(false) // Custom enterprise features
+  maxCampaigns      Int      @default(1)     // Maximum marketing campaigns
+  maxFileStorage    Int      @default(100)   // Storage in MB
+  prioritySupport   Boolean  @default(false) // Priority customer support
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  subscriptions     Subscription[]
+}
+
+model ProductImage {
+  id        String   @id @default(uuid())
+  url       String
+  isPrimary Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int      @default(1)
+  size      String?
+  color     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId, size, color])
+  @@index([cartId])
+  @@index([productId])
+}
+
+
+
+model BloggerReview {
+  id        String   @id @default(uuid())
+  name      String
+  role      String   // e.g. "Blogger", "Youtuber", "Influencer"
+  imageUrl  String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderNotification {
+  id              String    @id @default(uuid())
+  orderId         String
+  sellerId        String
+  sellerEmail     String
+  
+  emailSent       Boolean   @default(false)
+  sentAt          DateTime?
+  
+  orderItemsCount Int
+  totalAmount     Float
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([sellerId])
+  @@index([orderId])
+}
