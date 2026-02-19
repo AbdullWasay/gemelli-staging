@@ -34,6 +34,9 @@ export const metadata: Metadata = {
   title: "Home - Page Title",
   description: "Demo description",
   icons: "/demo.png",
+  verification: {
+    google: "9aIC9QShwIGuG2kNvNXMpKdFH_8hpVKL_ema0lVLsXI",
+  },
   openGraph: {
     title: "Home - Page Title",
     description: "Demo Description",
